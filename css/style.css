@@ -1,0 +1,175 @@
+:root {
+    --md-sys-color-primary: #0b57d0;
+    --md-sys-color-on-primary: #ffffff;
+    --md-sys-color-surface: #f3f4f6;
+    --md-sys-color-on-surface: #1f2937;
+    --md-sys-color-surface-container: #ffffff;
+    --md-sys-color-outline: #74777f;
+    --transition-speed: 0.3s;
+    --border-radius: 12px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', 'Noto Sans JP', sans-serif;
+    background-color: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+header {
+    background-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+main {
+    max-width: 1024px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* アコーディオン・コンテナ */
+.accordion-section {
+    background: var(--md-sys-color-surface-container);
+    border-radius: var(--border-radius);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    transition: box-shadow var(--transition-speed);
+}
+
+.accordion-header {
+    width: 100%;
+    text-align: left;
+    padding: 1.5rem;
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--md-sys-color-on-surface);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color var(--transition-speed);
+}
+
+.accordion-header:hover, .accordion-header:focus {
+    background-color: rgba(0, 0, 0, 0.04);
+    outline: none;
+}
+
+.accordion-header:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--md-sys-color-primary);
+}
+
+.accordion-icon {
+    transition: transform var(--transition-speed);
+}
+
+.accordion-section[aria-expanded="true"] .accordion-icon {
+    transform: rotate(180deg);
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1), opacity var(--transition-speed);
+    opacity: 0;
+}
+
+.accordion-section[aria-expanded="true"] .accordion-content {
+    max-height: 2000px; /* 十分に大きい値（動的なコンテンツ用） */
+    opacity: 1;
+    overflow-y: auto;
+}
+
+.content-inner {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+/* グリッドとカード */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.card {
+    display: flex;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    background: #fff;
+}
+
+.card:hover, .card:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-color: var(--md-sys-color-primary);
+    outline: none;
+}
+
+.card.selected {
+    border: 2px solid var(--md-sys-color-primary);
+    background-color: #f0f4ff;
+}
+
+/* 画像プレースホルダー (今後の画像実装用) */
+.card-image-placeholder {
+    width: 80px;
+    height: 80px;
+    background-color: #e5e7eb;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    font-size: 0.75rem;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.card-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.card-desc {
+    font-size: 0.85rem;
+    color: #4b5563;
+    white-space: pre-wrap; /* 改行を反映させる */
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ロード状態 */
+#loading {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+    color: var(--md-sys-color-primary);
+}
