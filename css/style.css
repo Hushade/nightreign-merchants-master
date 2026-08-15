@@ -71,6 +71,7 @@ main {
 }
 
 .accordion-header:focus-visible {
+    border-radius: var(--border-radius);
     box-shadow: inset 0 0 0 2px var(--md-sys-color-primary);
 }
 
@@ -103,7 +104,7 @@ main {
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
+    gap: calc(1rem - var(--border-radius)) 1rem;
 }
 
 .card {
@@ -111,6 +112,7 @@ main {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 1rem;
+    margin: var(--border-radius) 0 0 0;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
     background: #fff;
