@@ -23,16 +23,6 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-header {
-    background-color: var(--md-sys-color-primary);
-    color: var(--md-sys-color-on-primary);
-    padding: 1rem 2rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
 main {
     max-width: 1024px;
     margin: 2rem auto;
@@ -88,13 +78,11 @@ main {
     overflow: hidden;
     transition: max-height var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1), opacity var(--transition-speed);
     opacity: 0;
-    scrollbar-gutter: stable;
 }
 
 .accordion-section[aria-expanded="true"] .accordion-content {
-    max-height: 75vh;
+    max-height: 2000vh;
     opacity: 1;
-    overflow-y: auto;
 }
 
 .content-inner {
