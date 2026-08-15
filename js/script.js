@@ -1,7 +1,8 @@
 let normalData = [];
 let villageData = [];
 let goldenData = [];
-let selectedPattern = null;
+let villagePattern = null;
+let goldenPattern = null;
 
 // CSVの読み込み関数 (PapaParse使用)
 async function fetchAndParseCSV(filename) {
@@ -101,7 +102,9 @@ function renderCards(containerId, data, clickHandler) {
 
 // NormalMerchants選択時の処理
 function handleNormalSelection(patternId, selectedCard) {
-    selectedPattern = patternId;
+    const GOLDEN_PATTERN_MAP = [5, 6, 4, null, 2, 0, 3, 5, 6, 4, 1, 2, 0, 3, 5, 6, 4, 1, 2, 0, 3];
+    villagePattern = patternId;
+    goldenPattern = GOLDEN_PATTERN_MAP[patternId];
 
     // 選択状態のUI更新
     document.querySelectorAll('#normal-grid .card').forEach(c => c.classList.remove('selected'));
@@ -114,8 +117,8 @@ function handleNormalSelection(patternId, selectedCard) {
     document.getElementById('merchants-container').classList.remove('hidden');
     
     // パターン番号によるフィルタリング
-    const filteredVillage = villageData.filter(row => row[0] === selectedPattern);
-    const filteredGolden = goldenData.filter(row => row[0] === selectedPattern);
+    const filteredVillage = villageData.filter(row => row[0] === villagePattern?.toString());
+    const filteredGolden = goldenData.filter(row => row[0] === goldenPattern?.toString());
 
     renderCards('village-grid', filteredVillage, () => {});
     renderCards('golden-grid', filteredGolden, () => {});
