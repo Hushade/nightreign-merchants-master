@@ -88,10 +88,11 @@ main {
     overflow: hidden;
     transition: max-height var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1), opacity var(--transition-speed);
     opacity: 0;
+    scrollbar-gutter: stable;
 }
 
 .accordion-section[aria-expanded="true"] .accordion-content {
-    max-height: 2000px; /* 十分に大きい値（動的なコンテンツ用） */
+    max-height: 75vh;
     opacity: 1;
     overflow-y: auto;
 }
@@ -103,7 +104,7 @@ main {
 /* グリッドとカード */
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: calc(1rem - var(--border-radius)) 1rem;
 }
 
