@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>商品選択システム</title>
-    <!-- CSVパース用のライブラリ（改行を含むデータ等に安全に対応するため） -->
+    <title>NIGHTREIGN MERCHANTS MASTER</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <script src="js/script.js" defer></script>
@@ -13,7 +12,6 @@
     <main>
         <div id="loading">データを読み込んでいます...</div>
 
-        <!-- 1. Normal Merchants (ルート) -->
         <section id="normal-section" class="accordion-section hidden" aria-expanded="true">
             <button class="accordion-header" onclick="toggleAccordion('normal-section')">
                 <span>1. 基本商品を選択してください</span>
@@ -28,7 +26,6 @@
             </div>
         </section>
 
-        <!-- 2. 派生商人 (選択後に表示) -->
         <div id="merchants-container" class="hidden">
             <h2 style="margin: 1.5rem 0 1rem 0; font-size: 1.2rem;">2. 派生商品の確認（選択して展開）</h2>
             
