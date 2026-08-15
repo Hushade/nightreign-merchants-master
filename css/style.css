@@ -81,7 +81,7 @@ main {
 }
 
 .accordion-section[aria-expanded="true"] .accordion-content {
-    max-height: 400vh;
+    max-height: 700vh;
     opacity: 1;
 }
 
