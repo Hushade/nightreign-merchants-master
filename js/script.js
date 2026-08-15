@@ -132,6 +132,16 @@ function toggleAccordion(sectionId) {
 function setAccordionState(sectionId, expand) {
     const section = document.getElementById(sectionId);
     section.setAttribute('aria-expanded', expand);
+
+    // 折りたたまれている時は内部のカードにフォーカスが当たらないようにする
+    const cards = section.querySelectorAll('.card');
+    cards.forEach(card => {
+        if (expand) {
+            card.setAttribute('tabindex', '0'); // 開いている時はフォーカス可能
+        } else {
+            card.setAttribute('tabindex', '-1'); // 閉じている時はフォーカス不可（スキップされる）
+        }
+    });
 }
 
 // アプリケーション開始
