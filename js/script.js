@@ -74,6 +74,7 @@ function renderCards(containerId, data, clickHandler) {
                 <div class="card-image-wrapper">
                     <img src="${imagePath}"
                         alt="${name}"
+                        loading="lazy"
                         class="card-image"
                         onerror="this.onerror=null; this.parentElement.classList.add('no-image');">
                 </div>
