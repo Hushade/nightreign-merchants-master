@@ -65,11 +65,17 @@ function renderCards(containerId, data, clickHandler) {
         card.className = 'card';
         card.tabIndex = 0; // キーボード操作可能に
         
-        // 今後の画像実装のためのプレースホルダー
+        const imagePath = name === '不明な商品' ? '' : `images/${name}.png`;
+        
         card.innerHTML = `
             <div class="card-content">
             <div class="card-main">
-                <div class="card-image-placeholder">No Image</div>
+                <div class="card-image-wrapper">
+                    <img src="${imagePath}"
+                        alt="${name}"
+                        class="card-image"
+                        onerror="this.onerror=null; this.parentElement.classList.add('no-image');">
+                </div>
                 <div class="card-content">
                     <div class="card-title">${name}</div>
                     <div class="card-subtitle">${detail1}</div>
