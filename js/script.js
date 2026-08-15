@@ -56,6 +56,10 @@ function renderCards(containerId, data, clickHandler) {
         const name = row[1] || '不明な商品';
         const detail1 = row[2] || '';
         const detail2 = row[3] || '';
+        const detail2Lines = detail2.split('\n');
+        const detail2Html = detail2Lines
+            .map(line => `<p class="detail-line">${line}</p>`)
+            .join('');
 
         const card = document.createElement('div');
         card.className = 'card';
@@ -63,11 +67,15 @@ function renderCards(containerId, data, clickHandler) {
         
         // 今後の画像実装のためのプレースホルダー
         card.innerHTML = `
-            <div class="card-image-placeholder">No Image</div>
             <div class="card-content">
-                <div class="card-title">${name}</div>
-                <div class="card-desc">${detail1}</div>
-                <div class="card-desc" style="margin-top: 4px; font-size: 0.75rem;">${detail2}</div>
+            <div class="card-main">
+                <div class="card-image-placeholder">No Image</div>
+                <div class="card-content">
+                    <div class="card-title">${name}</div>
+                    <div class="card-subtitle">${detail1}</div>
+                </div>
+            </div>
+                <div class="card-desc">${detail2Html}</div>
             </div>
         `;
 

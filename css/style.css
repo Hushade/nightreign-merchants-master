@@ -143,10 +143,15 @@ main {
     flex-shrink: 0;
 }
 
+.card-main {
+    display: flex;
+    flex-direction: row;
+}
+
 .card-content {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: left;
     flex-grow: 1;
 }
 
@@ -156,10 +161,27 @@ main {
     margin-bottom: 0.25rem;
 }
 
-.card-desc {
+.card-subtitle {
     font-size: 0.85rem;
     color: #4b5563;
-    white-space: pre-wrap; /* 改行を反映させる */
+}
+
+.card-desc {
+    font-size: 0.75rem;
+    height: calc(1em * 1.5 * 3);
+    margin-top: 0.5rem;
+    overflow: hidden;
+}
+
+.detail-line {
+    margin: 0;
+    padding: 0;
+    color: #4b5563; /* 基本のテキスト色（1行目・2行目） */
+    white-space: nowrap; /* 途中の自動折り返しを防止 */
+}
+
+.detail-line:nth-child(3) {
+    color: #dc2626; /* 赤色 */
 }
 
 .hidden {
