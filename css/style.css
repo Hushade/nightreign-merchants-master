@@ -65,7 +65,7 @@ main {
     transition: background-color var(--transition-speed);
 }
 
-.accordion-header:hover, .accordion-header:focus {
+.accordion-header:hover {
     background-color: rgba(0, 0, 0, 0.04);
     outline: none;
 }
@@ -116,7 +116,7 @@ main {
     background: #fff;
 }
 
-.card:hover, .card:focus {
+.card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     border-color: var(--md-sys-color-primary);
