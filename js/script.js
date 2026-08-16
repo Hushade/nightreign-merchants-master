@@ -133,7 +133,7 @@ function handleNormalSelection(patternId, selectedCard) {
 function toggleAccordion(sectionId) {
     const section = document.getElementById(sectionId);
     const isExpanded = section.getAttribute('aria-expanded') === 'true';
-    
+
     // 開く場合は、他の派生セクションを閉じる（排他的アコーディオン）
     if (!isExpanded) {
         if (sectionId === 'normal-section') {

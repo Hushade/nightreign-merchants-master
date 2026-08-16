@@ -14,21 +14,17 @@
 
         <section id="normal-section" class="accordion-section hidden" aria-expanded="true">
             <button class="accordion-header" onclick="toggleAccordion('normal-section')">
-                <span>1. 基本商品を選択してください</span>
+                <span>通常商人</span>
                 <span class="accordion-icon">▼</span>
             </button>
             <div class="accordion-content">
                 <div class="content-inner">
-                    <div class="grid" id="normal-grid">
-                        <!-- JSで動的に追加 -->
-                    </div>
+                    <div class="grid" id="normal-grid"></div>
                 </div>
             </div>
         </section>
 
         <div id="merchants-container" class="hidden">
-            <h2 style="margin: 1.5rem 0 1rem 0; font-size: 1.2rem;">2. 派生商品の確認（選択して展開）</h2>
-            
             <section id="village-section" class="accordion-section" aria-expanded="false">
                 <button class="accordion-header" onclick="toggleAccordion('village-section')">
                     <span>村の商人</span>

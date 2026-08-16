@@ -58,7 +58,7 @@ https://hushade.github.io/nightreign-merchants-master/
 
 1. 単に、NIGHTREIGN MERCHANTS MASTER を利用したいのであれば、本プロジェクトの GitHub Pages にアクセスします。
 https://hushade.github.io/nightreign-merchants-master/
-2. 画面上の「基本商品を選択してください」のカードから通常の商品が売っているレア／ユニーク武器を選択します。
+2. 画面上の「通常商人」のリストから通常の商品が売っているレア／ユニーク武器を選択します。
 3. 選択後、対応する「村の商人」または「大空洞のレジェンド武器商人」の候補が表示されます。
 4. リストを選択して、各商人の売っている武器を確認します。
 
