@@ -127,9 +127,6 @@ function handleNormalSelection(patternId, selectedCard) {
     // 両方の派生セクションを一旦閉じた状態にする（ユーザーに選択させるため）
     setAccordionState('village-section', false);
     setAccordionState('golden-section', false);
-
-    // スムーズなスクロール
-    document.getElementById('merchants-container').scrollIntoView({ behavior: 'smooth' });
 }
 
 // アコーディオンの開閉トグル
@@ -139,8 +136,16 @@ function toggleAccordion(sectionId) {
     
     // 開く場合は、他の派生セクションを閉じる（排他的アコーディオン）
     if (!isExpanded) {
+        if (sectionId === 'normal-section') {
+            setAccordionState('village-section', false);
+            setAccordionState('golden-section', false);
+        }
         if (sectionId === 'village-section') setAccordionState('golden-section', false);
         if (sectionId === 'golden-section') setAccordionState('village-section', false);
+        
+        setTimeout(() => {
+            section.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
     }
     
     setAccordionState(sectionId, !isExpanded);
