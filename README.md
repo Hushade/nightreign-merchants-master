@@ -12,8 +12,6 @@ NIGHTREIGN MERCHANTS MASTER
 
 データは CSV から読み込まれるため、商品情報の更新や差し替えがしやすく、静的ページとして簡単に公開・運用できます。ユーザーは複数の候補を視覚的に見比べながら、欲しい商品や最適な組み合わせを調べることができます。
 
----
-
 ## 2. 主な機能・特徴
 
 - 通常商人の商品一覧をカード形式で表示
@@ -24,8 +22,6 @@ NIGHTREIGN MERCHANTS MASTER
 - 画像読み込みの失敗時に代替表示を行うフォールバック処理
 - キーボード操作に対応し、Enter / Space でカード選択可能
 - バックエンド不要のため、GitHub Pages へのデプロイが容易
-
----
 
 ## 3. 実際のサイト
 
@@ -50,9 +46,8 @@ https://hushade.github.io/nightreign-merchants-master/
 - data/NormalMerchants.csv
 - data/VillageMerchants.csv
 - data/GoldenMerchants.csv
+- data/asset-map.json
 - images/
-
----
 
 ## 5. 使い方・確認方法
 
@@ -63,8 +58,6 @@ https://hushade.github.io/nightreign-merchants-master/
 4. リストを選択して、各商人の売っている武器を確認します。
 
 > このサイトは `fetch()` で CSV ファイルを読み込んでいるため、ローカルファイルをそのままブラウザで直接開くと CORS 制約によりデータ取得に失敗することがあります。そのため、ローカル確認時は HTTP サーバーを起動して表示してください。
-
----
 
 ## 6. ディレクトリ構成
 
@@ -80,15 +73,22 @@ nightreign-merchants/
 ├── data/
 │   ├── NormalMerchants.csv  # 通常商人データ
 │   ├── VillageMerchants.csv # 村の商人データ
-│   └── GoldenMerchants.csv  # レジェンド商人データ
+│   ├── GoldenMerchants.csv  # レジェンド商人データ
+│   └── asset-map.json       # 商品名と画像ファイル名の対応表
 ├── images/                  # 商品画像（PNG等）
 ├── LICENSE                  # MIT License
 └── README.md                # このドキュメント
 ```
 
----
+## 7. テスト
 
-## 7. ライセンス
+`asset-map.json` は商品名をキー、画像ファイル名を値とするフラットな対応表です。商品を追加・変更する場合は、CSVと対応する画像を更新し、この対応表にもエントリを追加してください。画像の存在は次のコマンドで確認できます。
+
+```bash
+python -m unittest tests.test_fetch_images
+```
+
+## 8. ライセンス
 
 このプロジェクトは MIT License を採用しています。
 
