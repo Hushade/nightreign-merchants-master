@@ -1,196 +1,214 @@
-let normalData = [];
-let villageData = [];
-let goldenData = [];
-let villagePattern = null;
-let goldenPattern = null;
-let assetMap = null;
+const PATTERN_MAP = [5, 6, 4, null, 2, 0, 3, 5, 6, 4, 1, 2, 0, 3, 5, 6, 4, 1, 2, 0, 3];
 
-// Load and parse a CSV file with PapaParse.
-async function fetchAndParseCSV(filename) {
-    try {
-        const response = await fetch(filename);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const csvText = await response.text();
-        return new Promise((resolve) => {
-            Papa.parse(csvText, {
-                header: false,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    resolve(results.data);
-                }
-            });
-        });
-    } catch (error) {
-        console.error(`Failed to load ${filename}:`, error);
-        return [];
-    }
+const DATASETS = {
+    normal: { csvPath: 'data/NormalMerchants.csv', gridId: 'normal-grid' },
+    village: { csvPath: 'data/VillageMerchants.csv', gridId: 'village-grid' },
+    golden: { csvPath: 'data/GoldenMerchants.csv', gridId: 'golden-grid' }
+};
+
+const state = {
+    normal: [],
+    village: [],
+    golden: []
+};
+
+let assetMap = {};
+
+function parseMerchantRow(row) {
+    return {
+        patternId: row[0] || '',
+        name: row[1] || '不明な商品',
+        subtitle: row[2] || '',
+        details: row[3] || ''
+    };
 }
 
-// Load the normalized item-to-image map.
+async function fetchAndParseCSV(filename) {
+    const response = await fetch(filename);
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const csvText = await response.text();
+    return new Promise((resolve, reject) => {
+        Papa.parse(csvText, {
+            header: false,
+            skipEmptyLines: true,
+            complete: results => resolve(results.data.map(parseMerchantRow)),
+            error: error => reject(error)
+        });
+    });
+}
+
 async function loadAssetMap() {
     const assetMapPath = 'data/asset-map.json';
-    try {
-        const response = await fetch(assetMapPath);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        assetMap = await response.json();
-    } catch (error) {
-        console.error(`Failed to load ${assetMapPath}:`, error);
-        assetMap = {};
+    const response = await fetch(assetMapPath);
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
     }
+    assetMap = await response.json();
 }
 
-// Resolve an item name to its image path.
 function getImagePath(name) {
-    if (!assetMap || !name) return '';
     const fileName = assetMap[name];
     return fileName ? `images/${fileName}` : '';
 }
 
-// Initialize the application.
-async function init() {
-    // Load the asset map before rendering cards.
-    await loadAssetMap();
+function createDetailElement(details) {
+    const description = document.createElement('div');
+    description.className = 'card-desc';
 
-    // Load all merchant data files concurrently.
-    [normalData, villageData, goldenData] = await Promise.all([
-        fetchAndParseCSV('data/NormalMerchants.csv'),
-        fetchAndParseCSV('data/VillageMerchants.csv'),
-        fetchAndParseCSV('data/GoldenMerchants.csv')
-    ]);
+    details.split('\n').forEach(line => {
+        const detail = document.createElement('p');
+        detail.className = 'detail-line';
+        detail.textContent = line;
+        description.appendChild(detail);
+    });
 
-    document.getElementById('loading').classList.add('hidden');
-    const normalSection = document.getElementById('normal-section');
-    normalSection.classList.remove('hidden');
-
-    renderCards('normal-grid', normalData, handleNormalSelection);
+    return description;
 }
 
-// Render merchant cards into a grid.
-function renderCards(containerId, data, clickHandler) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = ''; // Clear stale cards before rendering.
+function createCard(item, onSelect) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.tabIndex = 0;
 
-    if (data.length === 0) {
-        container.innerHTML = '<p>該当する商品がありません。</p>';
+    const content = document.createElement('div');
+    content.className = 'card-content';
+
+    const main = document.createElement('div');
+    main.className = 'card-main';
+
+    const imageWrapper = document.createElement('div');
+    imageWrapper.className = 'card-image-wrapper';
+    const imagePath = getImagePath(item.name);
+    const image = document.createElement('img');
+    image.className = 'card-image';
+    image.alt = item.name;
+    image.loading = 'lazy';
+    if (imagePath) {
+        image.src = imagePath;
+        image.addEventListener('error', () => {
+            image.remove();
+            imageWrapper.classList.add('no-image');
+        }, { once: true });
+    } else {
+        imageWrapper.classList.add('no-image');
+    }
+    imageWrapper.appendChild(image);
+
+    const summary = document.createElement('div');
+    summary.className = 'card-content';
+    const title = document.createElement('div');
+    title.className = 'card-title';
+    title.textContent = item.name;
+    const subtitle = document.createElement('div');
+    subtitle.className = 'card-subtitle';
+    subtitle.textContent = item.subtitle;
+    summary.append(title, subtitle);
+
+    main.append(imageWrapper, summary);
+    content.append(main, createDetailElement(item.details));
+    card.appendChild(content);
+
+    const select = () => onSelect(item.patternId, card);
+    card.addEventListener('click', select);
+    card.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            select();
+        }
+    });
+
+    return card;
+}
+
+function renderCards(containerId, items, onSelect = () => {}) {
+    const container = document.getElementById(containerId);
+    container.replaceChildren();
+
+    if (items.length === 0) {
+        const emptyMessage = document.createElement('p');
+        emptyMessage.textContent = '該当する商品がありません。';
+        container.appendChild(emptyMessage);
         return;
     }
 
-    data.forEach((row) => {
-        // row[0]: pattern ID, row[1]: item name, row[2]: detail 1, row[3]: detail 2
-        const patternId = row[0];
-        const name = row[1] || '不明な商品';
-        const detail1 = row[2] || '';
-        const detail2 = row[3] || '';
-        const detail2Lines = detail2.split('\n');
-        const detail2Html = detail2Lines
-            .map(line => `<p class="detail-line">${line}</p>`)
-            .join('');
-
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.tabIndex = 0; // Keep cards keyboard-accessible.
-
-        // Look up the image using the item name only.
-        const imagePath = name === '不明な商品' ? '' : getImagePath(name);
-
-        card.innerHTML = `
-            <div class="card-content">
-            <div class="card-main">
-                <div class="card-image-wrapper">
-                    <img src="${imagePath}"
-                        alt="${name}"
-                        loading="lazy"
-                        class="card-image"
-                        onerror="this.onerror=null; this.parentElement.classList.add('no-image');">
-                </div>
-                <div class="card-content">
-                    <div class="card-title">${name}</div>
-                    <div class="card-subtitle">${detail1}</div>
-                </div>
-            </div>
-                <div class="card-desc">${detail2Html}</div>
-            </div>
-        `;
-
-        // Allow selection by click, Enter, or Space.
-        const triggerHandler = () => clickHandler(patternId, card);
-        card.addEventListener('click', triggerHandler);
-        card.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                triggerHandler();
-            }
-        });
-
-        container.appendChild(card);
-    });
+    const fragment = document.createDocumentFragment();
+    items.forEach(item => fragment.appendChild(createCard(item, onSelect)));
+    container.appendChild(fragment);
 }
 
-// Handle selection of a NormalMerchants card.
+async function init() {
+    try {
+        await loadAssetMap();
+        const [normal, village, golden] = await Promise.all(
+            Object.values(DATASETS).map(dataset => fetchAndParseCSV(dataset.csvPath))
+        );
+        [state.normal, state.village, state.golden] = [normal, village, golden];
+
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('normal-section').classList.remove('hidden');
+        renderCards(DATASETS.normal.gridId, state.normal, handleNormalSelection);
+    } catch (error) {
+        console.error('Failed to initialize merchant data:', error);
+        const loading = document.getElementById('loading');
+        loading.textContent = 'データの読み込みに失敗しました。ページを再読み込みしてください。';
+        loading.classList.add('error');
+    }
+}
+
 function handleNormalSelection(patternId, selectedCard) {
-    const GOLDEN_PATTERN_MAP = [5, 6, 4, null, 2, 0, 3, 5, 6, 4, 1, 2, 0, 3, 5, 6, 4, 1, 2, 0, 3];
-    villagePattern = patternId;
-    goldenPattern = GOLDEN_PATTERN_MAP[patternId];
+    const goldenPattern = PATTERN_MAP[Number(patternId)];
 
-    // Update the selected card state.
-    document.querySelectorAll('#normal-grid .card').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('#normal-grid .card').forEach(card => card.classList.remove('selected'));
     selectedCard.classList.add('selected');
-
-    // Collapse the normal merchant section.
     setAccordionState('normal-section', false);
-
-    // Show and render the filtered derived merchant sections.
     document.getElementById('merchants-container').classList.remove('hidden');
 
-    // Filter derived items by their mapped pattern IDs.
-    const filteredVillage = villageData.filter(row => row[0] === villagePattern?.toString());
-    const filteredGolden = goldenData.filter(row => row[0] === goldenPattern?.toString());
+    renderCards(DATASETS.village.gridId,
+        state.village.filter(item => item.patternId === patternId));
+    renderCards(DATASETS.golden.gridId,
+        goldenPattern === null
+            ? []
+            : state.golden.filter(item => item.patternId === String(goldenPattern)));
 
-    renderCards('village-grid', filteredVillage, () => {});
-    renderCards('golden-grid', filteredGolden, () => {});
-
-    // Keep both derived sections collapsed until the user opens one.
     setAccordionState('village-section', false);
     setAccordionState('golden-section', false);
 }
 
-// Toggle an accordion section.
 function toggleAccordion(sectionId) {
     const section = document.getElementById(sectionId);
     const isExpanded = section.getAttribute('aria-expanded') === 'true';
 
-    // Keep derived sections mutually exclusive when one is opened.
     if (!isExpanded) {
         if (sectionId === 'normal-section') {
             setAccordionState('village-section', false);
             setAccordionState('golden-section', false);
+        } else {
+            setAccordionState(sectionId === 'village-section' ? 'golden-section' : 'village-section', false);
         }
-        if (sectionId === 'village-section') setAccordionState('golden-section', false);
-        if (sectionId === 'golden-section') setAccordionState('village-section', false);
-
-        setTimeout(() => {
-            section.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
+        setTimeout(() => section.scrollIntoView({ behavior: 'smooth' }), 100);
     }
 
     setAccordionState(sectionId, !isExpanded);
 }
 
-// Set an accordion section's expanded state.
 function setAccordionState(sectionId, expand) {
     const section = document.getElementById(sectionId);
-    section.setAttribute('aria-expanded', expand);
-
-    // Prevent collapsed cards from receiving keyboard focus.
-    const cards = section.querySelectorAll('.card');
-    cards.forEach(card => {
-        if (expand) {
-            card.setAttribute('tabindex', '0'); // Expanded cards are focusable.
-        } else {
-            card.setAttribute('tabindex', '-1'); // Skip cards in collapsed sections.
-        }
+    section.setAttribute('aria-expanded', String(expand));
+    section.querySelectorAll('.card').forEach(card => {
+        card.tabIndex = expand ? 0 : -1;
     });
 }
 
-// Start the application after the document is ready.
-window.addEventListener('DOMContentLoaded', init);
+function registerEventHandlers() {
+    document.querySelectorAll('.accordion-header').forEach(header => {
+        header.addEventListener('click', () => toggleAccordion(header.dataset.sectionId));
+    });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    registerEventHandlers();
+    init();
+});

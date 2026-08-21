@@ -13,7 +13,7 @@
         <div id="loading">データを読み込んでいます...</div>
 
         <section id="normal-section" class="accordion-section hidden" aria-expanded="true">
-            <button class="accordion-header" onclick="toggleAccordion('normal-section')">
+            <button class="accordion-header" data-section-id="normal-section" aria-controls="normal-grid">
                 <span>通常商人</span>
                 <span class="accordion-icon">▼</span>
             </button>
@@ -26,7 +26,7 @@
 
         <div id="merchants-container" class="hidden">
             <section id="village-section" class="accordion-section" aria-expanded="false">
-                <button class="accordion-header" onclick="toggleAccordion('village-section')">
+                <button class="accordion-header" data-section-id="village-section" aria-controls="village-grid">
                     <span>村の商人</span>
                     <span class="accordion-icon">▼</span>
                 </button>
@@ -38,7 +38,7 @@
             </section>
 
             <section id="golden-section" class="accordion-section" aria-expanded="false">
-                <button class="accordion-header" onclick="toggleAccordion('golden-section')">
+                <button class="accordion-header" data-section-id="golden-section" aria-controls="golden-grid">
                     <span>大空洞のレジェンド武器商人</span>
                     <span class="accordion-icon">▼</span>
                 </button>
