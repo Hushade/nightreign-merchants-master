@@ -35,7 +35,7 @@ async function loadAssetMap() {
         assetMap = await response.json();
     } catch (error) {
         console.error(`Failed to load ${assetMapPath}:`, error);
-        assetMap = { normal: {}, village: {}, golden: {} };
+        assetMap = {};
     }
 }
 
