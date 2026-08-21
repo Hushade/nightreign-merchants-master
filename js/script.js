@@ -3,6 +3,7 @@ let villageData = [];
 let goldenData = [];
 let villagePattern = null;
 let goldenPattern = null;
+let assetMap = null;
 
 // CSVの読み込み関数 (PapaParse使用)
 async function fetchAndParseCSV(filename) {
@@ -20,13 +21,36 @@ async function fetchAndParseCSV(filename) {
             });
         });
     } catch (error) {
-        console.error(`${filename} の読み込みに失敗しました:`, error);
+        console.error(`Failed to load ${filename}:`, error);
         return [];
     }
 }
 
+// アセットマップの読み込み関数
+async function loadAssetMap() {
+    const assetMapPath = 'data/asset-map.json';
+    try {
+        const response = await fetch(assetMapPath);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        assetMap = await response.json();
+    } catch (error) {
+        console.error(`Failed to load ${assetMapPath}:`, error);
+        assetMap = { normal: {}, village: {}, golden: {} };
+    }
+}
+
+// セクション別に画像パスを取得する関数
+function getImagePath(name) {
+    if (!assetMap || !name) return '';
+    const fileName = assetMap[name];
+    return fileName ? `images/${fileName}` : '';
+}
+
 // 初期化処理
 async function init() {
+    // アセットマップを読み込み
+    await loadAssetMap();
+
     // 3つのファイルを並列で読み込み
     [normalData, villageData, goldenData] = await Promise.all([
         fetchAndParseCSV('data/NormalMerchants.csv'),
@@ -65,9 +89,10 @@ function renderCards(containerId, data, clickHandler) {
         const card = document.createElement('div');
         card.className = 'card';
         card.tabIndex = 0; // キーボード操作可能に
-        
-        const imagePath = name === '不明な商品' ? '' : `images/${name}.png`;
-        
+
+        // アセットマップから画像パスを取得（アイテム名のみを使用）
+        const imagePath = name === '不明な商品' ? '' : getImagePath(name);
+
         card.innerHTML = `
             <div class="card-content">
             <div class="card-main">
@@ -116,7 +141,7 @@ function handleNormalSelection(patternId, selectedCard) {
 
     // VillageとGoldenのセクションを表示し、データをフィルタリングして描画
     document.getElementById('merchants-container').classList.remove('hidden');
-    
+
     // パターン番号によるフィルタリング
     const filteredVillage = villageData.filter(row => row[0] === villagePattern?.toString());
     const filteredGolden = goldenData.filter(row => row[0] === goldenPattern?.toString());
@@ -142,12 +167,12 @@ function toggleAccordion(sectionId) {
         }
         if (sectionId === 'village-section') setAccordionState('golden-section', false);
         if (sectionId === 'golden-section') setAccordionState('village-section', false);
-        
+
         setTimeout(() => {
             section.scrollIntoView({ behavior: 'smooth' });
         }, 100);
     }
-    
+
     setAccordionState(sectionId, !isExpanded);
 }
 
