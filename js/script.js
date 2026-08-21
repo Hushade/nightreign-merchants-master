@@ -5,7 +5,7 @@ let villagePattern = null;
 let goldenPattern = null;
 let assetMap = null;
 
-// CSVの読み込み関数 (PapaParse使用)
+// Load and parse a CSV file with PapaParse.
 async function fetchAndParseCSV(filename) {
     try {
         const response = await fetch(filename);
@@ -26,7 +26,7 @@ async function fetchAndParseCSV(filename) {
     }
 }
 
-// アセットマップの読み込み関数
+// Load the normalized item-to-image map.
 async function loadAssetMap() {
     const assetMapPath = 'data/asset-map.json';
     try {
@@ -39,19 +39,19 @@ async function loadAssetMap() {
     }
 }
 
-// セクション別に画像パスを取得する関数
+// Resolve an item name to its image path.
 function getImagePath(name) {
     if (!assetMap || !name) return '';
     const fileName = assetMap[name];
     return fileName ? `images/${fileName}` : '';
 }
 
-// 初期化処理
+// Initialize the application.
 async function init() {
-    // アセットマップを読み込み
+    // Load the asset map before rendering cards.
     await loadAssetMap();
 
-    // 3つのファイルを並列で読み込み
+    // Load all merchant data files concurrently.
     [normalData, villageData, goldenData] = await Promise.all([
         fetchAndParseCSV('data/NormalMerchants.csv'),
         fetchAndParseCSV('data/VillageMerchants.csv'),
@@ -65,10 +65,10 @@ async function init() {
     renderCards('normal-grid', normalData, handleNormalSelection);
 }
 
-// カードのレンダリング
+// Render merchant cards into a grid.
 function renderCards(containerId, data, clickHandler) {
     const container = document.getElementById(containerId);
-    container.innerHTML = ''; // クリア
+    container.innerHTML = ''; // Clear stale cards before rendering.
 
     if (data.length === 0) {
         container.innerHTML = '<p>該当する商品がありません。</p>';
@@ -76,7 +76,7 @@ function renderCards(containerId, data, clickHandler) {
     }
 
     data.forEach((row) => {
-        // row[0]: パターン番号, row[1]: 名前, row[2]: 詳細1, row[3]: 詳細2
+        // row[0]: pattern ID, row[1]: item name, row[2]: detail 1, row[3]: detail 2
         const patternId = row[0];
         const name = row[1] || '不明な商品';
         const detail1 = row[2] || '';
@@ -88,9 +88,9 @@ function renderCards(containerId, data, clickHandler) {
 
         const card = document.createElement('div');
         card.className = 'card';
-        card.tabIndex = 0; // キーボード操作可能に
+        card.tabIndex = 0; // Keep cards keyboard-accessible.
 
-        // アセットマップから画像パスを取得（アイテム名のみを使用）
+        // Look up the image using the item name only.
         const imagePath = name === '不明な商品' ? '' : getImagePath(name);
 
         card.innerHTML = `
@@ -112,7 +112,7 @@ function renderCards(containerId, data, clickHandler) {
             </div>
         `;
 
-        // クリックまたはEnterキーで選択
+        // Allow selection by click, Enter, or Space.
         const triggerHandler = () => clickHandler(patternId, card);
         card.addEventListener('click', triggerHandler);
         card.addEventListener('keydown', (e) => {
@@ -126,40 +126,40 @@ function renderCards(containerId, data, clickHandler) {
     });
 }
 
-// NormalMerchants選択時の処理
+// Handle selection of a NormalMerchants card.
 function handleNormalSelection(patternId, selectedCard) {
     const GOLDEN_PATTERN_MAP = [5, 6, 4, null, 2, 0, 3, 5, 6, 4, 1, 2, 0, 3, 5, 6, 4, 1, 2, 0, 3];
     villagePattern = patternId;
     goldenPattern = GOLDEN_PATTERN_MAP[patternId];
 
-    // 選択状態のUI更新
+    // Update the selected card state.
     document.querySelectorAll('#normal-grid .card').forEach(c => c.classList.remove('selected'));
     selectedCard.classList.add('selected');
 
-    // Normalセクションを折りたたむ
+    // Collapse the normal merchant section.
     setAccordionState('normal-section', false);
 
-    // VillageとGoldenのセクションを表示し、データをフィルタリングして描画
+    // Show and render the filtered derived merchant sections.
     document.getElementById('merchants-container').classList.remove('hidden');
 
-    // パターン番号によるフィルタリング
+    // Filter derived items by their mapped pattern IDs.
     const filteredVillage = villageData.filter(row => row[0] === villagePattern?.toString());
     const filteredGolden = goldenData.filter(row => row[0] === goldenPattern?.toString());
 
     renderCards('village-grid', filteredVillage, () => {});
     renderCards('golden-grid', filteredGolden, () => {});
 
-    // 両方の派生セクションを一旦閉じた状態にする（ユーザーに選択させるため）
+    // Keep both derived sections collapsed until the user opens one.
     setAccordionState('village-section', false);
     setAccordionState('golden-section', false);
 }
 
-// アコーディオンの開閉トグル
+// Toggle an accordion section.
 function toggleAccordion(sectionId) {
     const section = document.getElementById(sectionId);
     const isExpanded = section.getAttribute('aria-expanded') === 'true';
 
-    // 開く場合は、他の派生セクションを閉じる（排他的アコーディオン）
+    // Keep derived sections mutually exclusive when one is opened.
     if (!isExpanded) {
         if (sectionId === 'normal-section') {
             setAccordionState('village-section', false);
@@ -176,21 +176,21 @@ function toggleAccordion(sectionId) {
     setAccordionState(sectionId, !isExpanded);
 }
 
-// アコーディオンの状態設定
+// Set an accordion section's expanded state.
 function setAccordionState(sectionId, expand) {
     const section = document.getElementById(sectionId);
     section.setAttribute('aria-expanded', expand);
 
-    // 折りたたまれている時は内部のカードにフォーカスが当たらないようにする
+    // Prevent collapsed cards from receiving keyboard focus.
     const cards = section.querySelectorAll('.card');
     cards.forEach(card => {
         if (expand) {
-            card.setAttribute('tabindex', '0'); // 開いている時はフォーカス可能
+            card.setAttribute('tabindex', '0'); // Expanded cards are focusable.
         } else {
-            card.setAttribute('tabindex', '-1'); // 閉じている時はフォーカス不可（スキップされる）
+            card.setAttribute('tabindex', '-1'); // Skip cards in collapsed sections.
         }
     });
 }
 
-// アプリケーション開始
+// Start the application after the document is ready.
 window.addEventListener('DOMContentLoaded', init);
