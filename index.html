@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NIGHTREIGN MERCHANTS MASTER</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <!-- Preload the data actually needed for first paint (normal merchants + image map).
+         script.js only requests these once it runs (deferred, after DOM parse), so without
+         this hint the browser's preload scanner can't discover them until then. -->
+    <link rel="preload" href="data/asset-map.json" as="fetch" crossorigin="anonymous">
+    <link rel="preload" href="data/NormalMerchants.csv" as="fetch" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css">
     <script src="js/vendor/papaparse.min.js" defer></script>
     <script src="js/script.js" defer></script>

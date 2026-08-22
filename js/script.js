@@ -9,7 +9,10 @@ const DATASETS = {
 const state = {
     normal: [],
     village: [],
-    golden: []
+    golden: [],
+
+    villagePromise: null,
+    goldenPromise: null
 };
 
 let assetMap = {};
@@ -139,17 +142,30 @@ function renderCards(containerId, items, onSelect = () => {}) {
     container.appendChild(fragment);
 }
 
+async function loadDeferredDataset(key) {
+    const items = await fetchAndParseCSV(DATASETS[key].csvPath);
+    state[key] = items;
+    return items;
+}
+
+function prefetchDeferredDatasets() {
+    state.villagePromise = loadDeferredDataset('village');
+    state.goldenPromise = loadDeferredDataset('golden');
+}
+
 async function init() {
     try {
-        await loadAssetMap();
-        const [normal, village, golden] = await Promise.all(
-            Object.values(DATASETS).map(dataset => fetchAndParseCSV(dataset.csvPath))
-        );
-        [state.normal, state.village, state.golden] = [normal, village, golden];
+        const [normal] = await Promise.all([
+            fetchAndParseCSV(DATASETS.normal.csvPath),
+            loadAssetMap()
+        ]);
+        state.normal = normal;
 
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('normal-section').classList.remove('hidden');
         renderCards(DATASETS.normal.gridId, state.normal, handleNormalSelection);
+
+        prefetchDeferredDatasets();
     } catch (error) {
         console.error('Failed to initialize merchant data:', error);
         const loading = document.getElementById('loading');
@@ -158,23 +174,24 @@ async function init() {
     }
 }
 
-function handleNormalSelection(patternId, selectedCard) {
+async function handleNormalSelection(patternId, selectedCard) {
     const goldenPattern = PATTERN_MAP[Number(patternId)];
 
     document.querySelectorAll('#normal-grid .card').forEach(card => card.classList.remove('selected'));
     selectedCard.classList.add('selected');
     setAccordionState('normal-section', false);
     document.getElementById('merchants-container').classList.remove('hidden');
+    setAccordionState('village-section', false);
+    setAccordionState('golden-section', false);
+
+    const [village, golden] = await Promise.all([state.villagePromise, state.goldenPromise]);
 
     renderCards(DATASETS.village.gridId,
-        state.village.filter(item => item.patternId === patternId));
+        village.filter(item => item.patternId === patternId));
     renderCards(DATASETS.golden.gridId,
         goldenPattern === null
             ? []
-            : state.golden.filter(item => item.patternId === String(goldenPattern)));
-
-    setAccordionState('village-section', false);
-    setAccordionState('golden-section', false);
+            : golden.filter(item => item.patternId === String(goldenPattern)));
 }
 
 function toggleAccordion(sectionId) {
