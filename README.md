@@ -34,8 +34,8 @@ https://hushade.github.io/nightreign-merchants-master/
 - HTML5
 - CSS3
 - JavaScript (Vanilla JS)
-- PapaParse
-  - CSV をブラウザ上で簡単に解析するために利用
+- PapaParse (v5.6.0, 自前ホスト)
+  - CSV をブラウザ上で簡単に解析するために利用。読み込み速度改善のため CDN 参照ではなく `js/vendor/papaparse.min.js` としてリポジトリ内に同梱している
 - CSS Variables / Responsive Grid
   - レイアウトと見た目の統一、レスポンシブ対応
 
@@ -43,6 +43,7 @@ https://hushade.github.io/nightreign-merchants-master/
 - index.html
 - css/style.css
 - js/script.js
+- js/vendor/papaparse.min.js
 - data/NormalMerchants.csv
 - data/VillageMerchants.csv
 - data/GoldenMerchants.csv
@@ -69,7 +70,9 @@ nightreign-merchants/
 ├── css/
 │   └── style.css            # UIスタイル定義
 ├── js/
-│   └── script.js            # CSV読み込み、カード生成、アコーディオン制御
+│   ├── script.js            # CSV読み込み、カード生成、アコーディオン制御
+│   └── vendor/
+│       └── papaparse.min.js # PapaParse本体（自前ホスト、v5.6.0固定）
 ├── data/
 │   ├── NormalMerchants.csv  # 通常商人データ
 │   ├── VillageMerchants.csv # 村の商人データ
