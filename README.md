@@ -1,98 +1,78 @@
 # NIGHTREIGN MERCHANTS MASTER
 
-このプロジェクトは、ゲーム内の「通常商人」から派生する「村の商人」「大空洞のレジェンド武器商人」の商品候補を、簡単に比較・確認できる静的サイトです。
+CSVで管理した商人データをもとに、基本商品選択から派生商品（村の商人／大空洞のレジェンド武器商人）を絞り込み表示する静的サイト。ビルドツール・フレームワークは使用せず、Vanilla JS + PapaParse のみで構成される。
 
-## 1. プロジェクト名と概要
-
-### プロジェクト名
-NIGHTREIGN MERCHANTS MASTER
-
-### 概要
-本サイトは、ゲーム内の装備品や商人の関連商品を、カード形式で一覧表示し、ユーザーが「基本商品」を選択すると対応する派生商品を自動で絞り込み表示するためのWebツールです。
-
-データは CSV から読み込まれるため、商品情報の更新や差し替えがしやすく、静的ページとして簡単に公開・運用できます。ユーザーは複数の候補を視覚的に見比べながら、欲しい商品や最適な組み合わせを調べることができます。
-
-## 2. 主な機能・特徴
-
-- 通常商人の商品一覧をカード形式で表示
-- 1つの基本商品を選択すると、対応する村の商人・レジェンド商人の商品を自動で表示
-- CSV データを読み込み、商品名・効果・派生パターンを柔軟に管理
-- アコーディオン形式で各セクションを開閉できるUI
-- レスポンシブデザインに対応し、PC / タブレット / スマートフォンで見やすく表示
-- 画像読み込みの失敗時に代替表示を行うフォールバック処理
-- キーボード操作に対応し、Enter / Space でカード選択可能
-- バックエンド不要のため、GitHub Pages へのデプロイが容易
-
-## 3. 実際のサイト
-
-### GitHub Pages
+## サイト
 
 https://hushade.github.io/nightreign-merchants-master/
 
-## 4. 技術スタック
 
-- HTML5
-- CSS3
-- JavaScript (Vanilla JS)
-- PapaParse (v5.6.0, 自前ホスト)
-  - CSV をブラウザ上で簡単に解析するために利用。読み込み速度改善のため CDN 参照ではなく `js/vendor/papaparse.min.js` としてリポジトリ内に同梱している
-- CSS Variables / Responsive Grid
-  - レイアウトと見た目の統一、レスポンシブ対応
+## 技術スタック
 
-利用している主なファイル:
-- index.html
-- css/style.css
-- js/script.js
-- js/vendor/papaparse.min.js
-- data/NormalMerchants.csv
-- data/VillageMerchants.csv
-- data/GoldenMerchants.csv
-- data/asset-map.json
-- images/
+- HTML5 / CSS3 / Vanilla JavaScript（ビルドステップなし、npm等の依存管理なし）
+- [PapaParse](https://www.papaparse.com/)（CDN経由で読み込み、CSVパース用）
+- データソース: `data/*.csv`（商人ごとの商品データ）+ `data/asset-map.json`（商品名→画像ファイル名の対応表）
 
-## 5. 使い方・確認方法
+## ディレクトリ構成
 
-1. 単に、NIGHTREIGN MERCHANTS MASTER を利用したいのであれば、本プロジェクトの GitHub Pages にアクセスします。
-https://hushade.github.io/nightreign-merchants-master/
-2. 画面上の「通常商人」のリストから通常の商品が売っているレア／ユニーク武器を選択します。
-3. 選択後、対応する「村の商人」または「大空洞のレジェンド武器商人」の候補が表示されます。
-4. リストを選択して、各商人の売っている武器を確認します。
-
-> このサイトは `fetch()` で CSV ファイルを読み込んでいるため、ローカルファイルをそのままブラウザで直接開くと CORS 制約によりデータ取得に失敗することがあります。そのため、ローカル確認時は HTTP サーバーを起動して表示してください。
-
-## 6. ディレクトリ構成
-
-以下のような構成を想定しています。
-
-```text
-nightreign-merchants/
-├── index.html               # メインのHTML
+```
+nightreign-merchants-master/
+├── index.html
 ├── css/
-│   └── style.css            # UIスタイル定義
+│   └── style.css
 ├── js/
-│   ├── script.js            # CSV読み込み、カード生成、アコーディオン制御
+│   ├── script.js
 │   └── vendor/
-│       └── papaparse.min.js # PapaParse本体（自前ホスト、v5.6.0固定）
+│       └── papaparse.min.js   # PapaParse本体（自前ホスト、v5.6.0固定）
 ├── data/
-│   ├── NormalMerchants.csv  # 通常商人データ
-│   ├── VillageMerchants.csv # 村の商人データ
-│   ├── GoldenMerchants.csv  # レジェンド商人データ
-│   └── asset-map.json       # 商品名と画像ファイル名の対応表
-├── images/                  # 商品画像（PNG等）
-├── LICENSE                  # MIT License
-└── README.md                # このドキュメント
+│   ├── NormalMerchants.csv    # 通常商人
+│   ├── VillageMerchants.csv   # 村の商人
+│   ├── GoldenMerchants.csv    # 大空洞のレジェンド武器商人
+│   └── asset-map.json         # 商品名 → 画像ファイル名
+├── images/                    # 商品画像
+├── tests/
+│   └── test_fetch_images.py   # asset-map.json / CSV と images/ の整合性テスト
+├── LICENSE
+└── README.md
 ```
 
-## 7. テスト
+`docs/` フォルダは存在せず、`index.html` はリポジトリルート直下に置かれている。
 
-`asset-map.json` は商品名をキー、画像ファイル名を値とするフラットな対応表です。商品を追加・変更する場合は、CSVと対応する画像を更新し、この対応表にもエントリを追加してください。画像の存在は次のコマンドで確認できます。
+## ローカルでの確認
+
+`js/script.js` は CSV・JSON を `fetch()` で読み込むため、`index.html` を `file://` で直接開くと CORS 制約により読み込みに失敗する。ローカルHTTPサーバーを起動して確認すること。
+
+```bash
+python -m http.server 8000
+# http://localhost:8000/ にアクセス
+```
+
+ビルドステップは存在しない。静的ファイルをそのまま配信する構成のため、上記以外の準備は不要。
+
+## デプロイ
+
+GitHub Pages を使用。公開元は `main` ブランチのルート直下（Settings → Pages）。CIワークフロー（GitHub Actions）は使用しておらず（`.github/` は `.gitignore` 対象)、`main` への push がそのまま本番反映される。
+
+## データの追加・更新
+
+商品を追加・変更する場合の手順:
+
+1. 該当する `data/*.csv` を更新
+2. 画像を `images/` に追加
+3. `data/asset-map.json` に商品名→画像ファイル名のエントリを追加
+
+追加後、画像が実際に取得可能かは以下でチェックできる。
 
 ```bash
 python -m unittest tests.test_fetch_images
 ```
 
-## 8. ライセンス
+このテストはローカルHTTPサーバーを内部で起動し、`asset-map.json` とCSV内の商品名から導出される画像ファイルすべてに対して実際にリクエストを送り、取得可否を検証する。
 
-このプロジェクトは MIT License を採用しています。
+## パターンID対応ロジック
 
-詳細は [LICENSE](LICENSE) を参照してください。
+`js/script.js` の `PATTERN_MAP` は、通常商人の `patternId`（CSVの1列目）から大空洞のレジェンド武器商人の `patternId` への対応表（配列インデックス→値）。値が `null` の位置は、対応するレジェンド商人が存在しないパターンを意味する。商人データの構造やパターン数を変更する場合、この配列との整合性を保つ必要がある。
+
+## ライセンス
+
+MIT License。詳細は [LICENSE](LICENSE) を参照。
